@@ -1,0 +1,90 @@
+{
+  "version": "38.0.1",
+  "artifacts": {
+    "TrustAdvisorServiceStack.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "TrustAdvisorServiceStack.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "TrustAdvisorServiceStack": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://713881821833/ap-northeast-2",
+      "properties": {
+        "templateFile": "TrustAdvisorServiceStack.template.json",
+        "terminationProtection": false,
+        "validateOnSynth": false,
+        "notificationArns": [],
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::713881821833:role/cdk-hnb659fds-deploy-role-713881821833-ap-northeast-2",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::713881821833:role/cdk-hnb659fds-cfn-exec-role-713881821833-ap-northeast-2",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-713881821833-ap-northeast-2/4e99a3a060a621bb509f018a3c079f0291b6c0245087b61b7d573a6b3d40aba8.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "TrustAdvisorServiceStack.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::713881821833:role/cdk-hnb659fds-lookup-role-713881821833-ap-northeast-2",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "TrustAdvisorServiceStack.assets"
+      ],
+      "metadata": {
+        "/TrustAdvisorServiceStack/TrustAdvisorUserPool/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TrustAdvisorUserPool6FFB971E"
+          }
+        ],
+        "/TrustAdvisorServiceStack/TrustAdvisorUserPoolClient/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TrustAdvisorUserPoolClientFA1DEF35"
+          }
+        ],
+        "/TrustAdvisorServiceStack/UserPoolId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPoolId"
+          }
+        ],
+        "/TrustAdvisorServiceStack/UserPoolClientId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPoolClientId"
+          }
+        ],
+        "/TrustAdvisorServiceStack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/TrustAdvisorServiceStack/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/TrustAdvisorServiceStack/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "TrustAdvisorServiceStack"
+    },
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    }
+  }
+}

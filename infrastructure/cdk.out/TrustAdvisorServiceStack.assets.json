@@ -1,0 +1,20 @@
+{
+  "version": "38.0.1",
+  "files": {
+    "4e99a3a060a621bb509f018a3c079f0291b6c0245087b61b7d573a6b3d40aba8": {
+      "source": {
+        "path": "TrustAdvisorServiceStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "713881821833-ap-northeast-2": {
+          "bucketName": "cdk-hnb659fds-assets-713881821833-ap-northeast-2",
+          "objectKey": "4e99a3a060a621bb509f018a3c079f0291b6c0245087b61b7d573a6b3d40aba8.json",
+          "region": "ap-northeast-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::713881821833:role/cdk-hnb659fds-file-publishing-role-713881821833-ap-northeast-2"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}
