@@ -106,9 +106,22 @@ export default function Dashboard() {
                 placeholder="arn:aws:iam::123456789012:role/TrustAdvisorRole"
                 required
               />
+              <p className="text-xs text-gray-500 mt-1">
+                예시: arn:aws:iam::123456789012:role/YourRoleName
+              </p>
               <p className="text-sm text-gray-500 mt-1">
                 고객 계정에서 이 서비스 계정({serviceAccountId})을 신뢰하는 역할의 ARN
               </p>
+              <div className="mt-2 p-3 bg-blue-50 rounded-md text-sm">
+                <p className="font-medium text-blue-800">역할 생성 방법:</p>
+                <ol className="list-decimal list-inside text-blue-700 mt-1 space-y-1">
+                  <li>AWS IAM 콘솔에서 "역할 생성"</li>
+                  <li>"다른 AWS 계정" 선택</li>
+                  <li>계정 ID: {serviceAccountId}</li>
+                  <li>권한: AWSSupportAccess 정책 연결</li>
+                  <li>역할 이름: 예) TrustAdvisorRole</li>
+                </ol>
+              </div>
             </div>
             
             <div>
