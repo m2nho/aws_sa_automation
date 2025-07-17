@@ -1,0 +1,1 @@
+export { LambdaRuntimeCheck } from './runtime-check';

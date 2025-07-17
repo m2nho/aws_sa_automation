@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { CheckManager } from '../services/check-manager';
+import { CheckRequest } from '../types/checks';
 
 export class ChecksController {
   private checkManager: CheckManager | null = null;
@@ -11,27 +12,51 @@ export class ChecksController {
     return this.checkManager;
   }
 
-  performEC2Checks = async (req: Request, res: Response) => {
+  performChecks = async (req: Request, res: Response) => {
     try {
-      const { roleArn, sessionName } = req.body;
+      const checkRequest: CheckRequest = req.body;
+      console.log('Received check request:', JSON.stringify(checkRequest, null, 2));
       
       const checkManager = this.getCheckManager();
-      const credentials = await checkManager.assumeRole(roleArn, sessionName);
-      const checks = await checkManager.performEC2Checks(
+      const credentials = await checkManager.assumeRole(
+        checkRequest.roleArn, 
+        checkRequest.sessionName
+      );
+      
+      const results = await checkManager.performChecks(
+        checkRequest,
         credentials, 
         process.env.AWS_REGION || 'ap-northeast-2'
       );
 
       res.json({
         success: true,
-        checks,
+        results,
         timestamp: new Date().toISOString(),
       });
     } catch (error: any) {
-      console.error('EC2 checks error:', error);
+      console.error('Checks error:', error);
       res.status(500).json({
         success: false,
-        error: error.message || 'Failed to perform EC2 checks'
+        error: error.message || 'Failed to perform checks'
+      });
+    }
+  };
+
+  getAvailableChecks = async (req: Request, res: Response) => {
+    try {
+      const { service } = req.query;
+      const checkManager = this.getCheckManager();
+      const checks = checkManager.getAvailableChecks(service as string);
+      
+      res.json({
+        success: true,
+        checks
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Failed to get available checks'
       });
     }
   };

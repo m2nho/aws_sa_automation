@@ -5,7 +5,7 @@ export interface CheckRequest {
 }
 
 export interface ServiceCheckRequest {
-  serviceName: 'ec2' | 's3' | 'rds' | 'iam';
+  serviceName: 'ec2' | 's3' | 'rds' | 'iam' | 'lambda';
   checks: string[];
 }
 

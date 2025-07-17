@@ -1,15 +1,33 @@
 import { EC2ClientService } from './aws/ec2-client';
+import { LambdaClientService } from './aws/lambda-client';
+import { S3ClientService } from './aws/s3-client';
 import { TrustAdvisorCheck, CheckRequest, ServiceCheckResult } from '../types/checks';
 import { CHECK_CLASSES, getAvailableChecks } from './checks/check-registry';
 
 export class CheckManager {
   private ec2Service: EC2ClientService | null = null;
+  private lambdaService: LambdaClientService | null = null;
+  private s3Service: S3ClientService | null = null;
 
   private getEC2Service() {
     if (!this.ec2Service) {
       this.ec2Service = new EC2ClientService();
     }
-    return this.ec2service;
+    return this.ec2Service;
+  }
+
+  private getLambdaService() {
+    if (!this.lambdaService) {
+      this.lambdaService = new LambdaClientService();
+    }
+    return this.lambdaService;
+  }
+
+  private getS3Service() {
+    if (!this.s3Service) {
+      this.s3Service = new S3ClientService();
+    }
+    return this.s3Service;
   }
 
   async assumeRole(roleArn: string, sessionName: string) {
@@ -17,19 +35,29 @@ export class CheckManager {
   }
 
   async performChecks(request: CheckRequest, credentials: any, region: string): Promise<ServiceCheckResult[]> {
+    console.log('performChecks called with request:', JSON.stringify(request, null, 2));
     const results: ServiceCheckResult[] = [];
 
     for (const serviceRequest of request.services) {
+      console.log('Processing service:', serviceRequest.serviceName, 'with checks:', serviceRequest.checks);
+      
       if (serviceRequest.serviceName === 'ec2') {
         const ec2Results = await this.performEC2Checks(serviceRequest.checks, credentials, region);
-        results.push({
-          serviceName: 'ec2',
-          checks: ec2Results
-        });
+        results.push({ serviceName: 'ec2', checks: ec2Results });
+      } else if (serviceRequest.serviceName === 'lambda') {
+        console.log('Starting Lambda checks...');
+        const lambdaResults = await this.performLambdaChecks(serviceRequest.checks, credentials, region);
+        results.push({ serviceName: 'lambda', checks: lambdaResults });
+      } else if (serviceRequest.serviceName === 's3') {
+        console.log('Starting S3 checks...');
+        const s3Results = await this.performS3Checks(serviceRequest.checks, credentials, region);
+        results.push({ serviceName: 's3', checks: s3Results });
+      } else {
+        console.log('Unknown service:', serviceRequest.serviceName);
       }
-      // 다른 서비스들도 여기에 추가 가능
     }
 
+    console.log('Final results:', results.length, 'services processed');
     return results;
   }
 
@@ -90,6 +118,83 @@ export class CheckManager {
         return await checkInstance.execute(resources.volumes);
       default:
         return [];
+    }
+  }
+
+  private async performLambdaChecks(checkIds: string[], credentials: any, region: string): Promise<TrustAdvisorCheck[]> {
+    console.log('Performing Lambda checks:', checkIds);
+    
+    const lambdaService = this.getLambdaService();
+    const lambdaClient = lambdaService.createLambdaClient(credentials, region);
+    
+    try {
+      const functions = await lambdaService.getFunctions(lambdaClient);
+      const results: TrustAdvisorCheck[] = [];
+      
+      for (const checkId of checkIds) {
+        const CheckClass = CHECK_CLASSES[checkId as keyof typeof CHECK_CLASSES];
+        if (CheckClass && checkId === 'lambda-runtime') {
+          const checkInstance = new CheckClass();
+          const checkResults = await (checkInstance as any).execute(functions);
+          console.log('Lambda check results:', checkResults);
+          results.push(...checkResults);
+        }
+      }
+      
+      console.log('Total Lambda results:', results.length);
+      return results;
+    } catch (error) {
+      console.error('Lambda checks failed:', error);
+      throw error;
+    }
+  }
+
+  private async performS3Checks(checkIds: string[], credentials: any, region: string): Promise<TrustAdvisorCheck[]> {
+    console.log('Performing S3 checks:', checkIds);
+    
+    const s3Service = this.getS3Service();
+    const s3Client = s3Service.createS3Client(credentials, region);
+    
+    try {
+      const buckets = await s3Service.getBuckets(s3Client);
+      const bucketPolicies: any = {};
+      const encryptionConfigs: any = {};
+      
+      // 필요한 데이터만 수집
+      if (checkIds.includes('s3-bucket-policy')) {
+        for (const bucket of buckets) {
+          bucketPolicies[bucket.Name!] = await s3Service.getBucketPolicy(s3Client, bucket.Name!);
+        }
+      }
+      
+      if (checkIds.includes('s3-encryption')) {
+        for (const bucket of buckets) {
+          encryptionConfigs[bucket.Name!] = await s3Service.getBucketEncryption(s3Client, bucket.Name!);
+        }
+      }
+      
+      const results: TrustAdvisorCheck[] = [];
+      
+      for (const checkId of checkIds) {
+        const CheckClass = CHECK_CLASSES[checkId as keyof typeof CHECK_CLASSES];
+        if (CheckClass) {
+          const checkInstance = new CheckClass();
+          let checkResults: TrustAdvisorCheck[] = [];
+          
+          if (checkId === 's3-bucket-policy') {
+            checkResults = await (checkInstance as any).execute(buckets, bucketPolicies);
+          } else if (checkId === 's3-encryption') {
+            checkResults = await (checkInstance as any).execute(buckets, encryptionConfigs);
+          }
+          
+          results.push(...checkResults);
+        }
+      }
+      
+      return results;
+    } catch (error) {
+      console.error('S3 checks failed:', error);
+      throw error;
     }
   }
 

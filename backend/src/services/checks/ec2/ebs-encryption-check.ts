@@ -10,14 +10,35 @@ export class EBSEncryptionCheck extends BaseCheck {
   async execute(volumes: any[]): Promise<TrustAdvisorCheck[]> {
     const results: TrustAdvisorCheck[] = [];
 
+    if (volumes.length === 0) {
+      results.push(this.createCheck(
+        'ec2-no-volumes',
+        'EBS 볼륨 없음',
+        'ok',
+        'EBS 볼륨이 없습니다.',
+        []
+      ));
+      return results;
+    }
+
     for (const volume of volumes) {
+      const volumeName = volume.Tags?.find((tag: any) => tag.Key === 'Name')?.Value || volume.VolumeId;
+      
       if (!volume.Encrypted) {
         results.push(this.createCheck(
           `volume-${volume.VolumeId}`,
-          `암호화되지 않은 볼륨: ${volume.VolumeId}`,
+          `EBS 볼륨: ${volumeName}`,
           'error',
-          `EBS 볼륨이 암호화되지 않았습니다.`,
-          [volume.VolumeId]
+          `암호화되지 않았습니다. (${volume.Size}GB)`,
+          [volumeName]
+        ));
+      } else {
+        results.push(this.createCheck(
+          `volume-${volume.VolumeId}`,
+          `EBS 볼륨: ${volumeName}`,
+          'ok',
+          `암호화되어 있습니다. (${volume.Size}GB)`,
+          [volumeName]
         ));
       }
     }
