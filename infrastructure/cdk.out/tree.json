@@ -120,6 +120,381 @@
               "version": "2.161.1"
             }
           },
+          "BedrockAgentRole": {
+            "id": "BedrockAgentRole",
+            "path": "TrustAdvisorServiceStack/BedrockAgentRole",
+            "children": {
+              "ImportBedrockAgentRole": {
+                "id": "ImportBedrockAgentRole",
+                "path": "TrustAdvisorServiceStack/BedrockAgentRole/ImportBedrockAgentRole",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.Resource",
+                  "version": "2.161.1"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "TrustAdvisorServiceStack/BedrockAgentRole/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                  "aws:cdk:cloudformation:props": {
+                    "assumeRolePolicyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "sts:AssumeRole",
+                          "Effect": "Allow",
+                          "Principal": {
+                            "Service": "bedrock.amazonaws.com"
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "managedPolicyArns": [
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":iam::aws:policy/AmazonBedrockFullAccess"
+                          ]
+                        ]
+                      }
+                    ],
+                    "policies": [
+                      {
+                        "policyName": "ReadOnlyAccess",
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": [
+                                "cloudwatch:Get*",
+                                "cloudwatch:List*",
+                                "ec2:Describe*",
+                                "iam:Get*",
+                                "iam:List*",
+                                "lambda:Get*",
+                                "lambda:List*",
+                                "s3:Get*",
+                                "s3:List*",
+                                "support:Describe*",
+                                "trustedadvisor:Describe*"
+                              ],
+                              "Effect": "Allow",
+                              "Resource": "*"
+                            },
+                            {
+                              "Action": "lambda:InvokeFunction",
+                              "Effect": "Allow",
+                              "Resource": "arn:aws:lambda:ap-northeast-2:713881821833:function:*MCPServerLambda*"
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                  "version": "2.161.1"
+                }
+              },
+              "DefaultPolicy": {
+                "id": "DefaultPolicy",
+                "path": "TrustAdvisorServiceStack/BedrockAgentRole/DefaultPolicy",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "TrustAdvisorServiceStack/BedrockAgentRole/DefaultPolicy/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                      "aws:cdk:cloudformation:props": {
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": "lambda:InvokeFunction",
+                              "Effect": "Allow",
+                              "Resource": [
+                                {
+                                  "Fn::GetAtt": [
+                                    "MCPServerLambdaD36410E3",
+                                    "Arn"
+                                  ]
+                                },
+                                {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      {
+                                        "Fn::GetAtt": [
+                                          "MCPServerLambdaD36410E3",
+                                          "Arn"
+                                        ]
+                                      },
+                                      ":*"
+                                    ]
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "policyName": "BedrockAgentRoleDefaultPolicy1462CD5B",
+                        "roles": [
+                          {
+                            "Ref": "BedrockAgentRole7C982E0C"
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                      "version": "2.161.1"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.Policy",
+                  "version": "2.161.1"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Role",
+              "version": "2.161.1"
+            }
+          },
+          "MCPServerLambda": {
+            "id": "MCPServerLambda",
+            "path": "TrustAdvisorServiceStack/MCPServerLambda",
+            "children": {
+              "ServiceRole": {
+                "id": "ServiceRole",
+                "path": "TrustAdvisorServiceStack/MCPServerLambda/ServiceRole",
+                "children": {
+                  "ImportServiceRole": {
+                    "id": "ImportServiceRole",
+                    "path": "TrustAdvisorServiceStack/MCPServerLambda/ServiceRole/ImportServiceRole",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.Resource",
+                      "version": "2.161.1"
+                    }
+                  },
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "TrustAdvisorServiceStack/MCPServerLambda/ServiceRole/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                      "aws:cdk:cloudformation:props": {
+                        "assumeRolePolicyDocument": {
+                          "Statement": [
+                            {
+                              "Action": "sts:AssumeRole",
+                              "Effect": "Allow",
+                              "Principal": {
+                                "Service": "lambda.amazonaws.com"
+                              }
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "managedPolicyArns": [
+                          {
+                            "Fn::Join": [
+                              "",
+                              [
+                                "arn:",
+                                {
+                                  "Ref": "AWS::Partition"
+                                },
+                                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                              ]
+                            ]
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                      "version": "2.161.1"
+                    }
+                  },
+                  "DefaultPolicy": {
+                    "id": "DefaultPolicy",
+                    "path": "TrustAdvisorServiceStack/MCPServerLambda/ServiceRole/DefaultPolicy",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "TrustAdvisorServiceStack/MCPServerLambda/ServiceRole/DefaultPolicy/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                          "aws:cdk:cloudformation:props": {
+                            "policyDocument": {
+                              "Statement": [
+                                {
+                                  "Action": [
+                                    "ec2:Describe*",
+                                    "lambda:Get*",
+                                    "lambda:List*",
+                                    "s3:Get*",
+                                    "s3:List*"
+                                  ],
+                                  "Effect": "Allow",
+                                  "Resource": "*"
+                                }
+                              ],
+                              "Version": "2012-10-17"
+                            },
+                            "policyName": "MCPServerLambdaServiceRoleDefaultPolicyE5A252DF",
+                            "roles": [
+                              {
+                                "Ref": "MCPServerLambdaServiceRole80A37792"
+                              }
+                            ]
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                          "version": "2.161.1"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.Policy",
+                      "version": "2.161.1"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.Role",
+                  "version": "2.161.1"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "TrustAdvisorServiceStack/MCPServerLambda/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Function",
+                  "aws:cdk:cloudformation:props": {
+                    "code": {
+                      "zipFile": "\n        const { EC2Client, DescribeInstancesCommand } = require('@aws-sdk/client-ec2');\n        const { S3Client, ListBucketsCommand, GetBucketEncryptionCommand } = require('@aws-sdk/client-s3');\n        const { LambdaClient, ListFunctionsCommand } = require('@aws-sdk/client-lambda');\n        \n        exports.handler = async (event) => {\n          console.log('🚀 MCP LAMBDA CALLED! Event:', JSON.stringify(event, null, 2));\n          console.log('🚀 LAMBDA FUNCTION DEFINITELY INVOKED!');\n          \n          const { actionGroup, function: functionName, parameters } = event;\n          \n          try {\n            console.log('Processing actionGroup:', actionGroup);\n            switch (actionGroup) {\n              case 'resourcecheck':\n                console.log('🔍 Calling checkResources function');\n                return await checkResources(parameters);\n              default:\n                console.log('❌ Unknown action group:', actionGroup);\n                return { error: 'Unknown action group: ' + actionGroup };\n            }\n          } catch (error) {\n            console.log('❌ Lambda error:', error);\n            return {\n              messageVersion: '1.0',\n              response: {\n                actionGroup: actionGroup,\n                function: functionName,\n                functionResponse: {\n                  responseBody: {\n                    'TEXT': {\n                      body: 'Error: ' + error.message\n                    }\n                  }\n                }\n              }\n            };\n          }\n        };\n        \n        async function checkResources(params) {\n          console.log('🔍 checkResources function called with params:', params);\n          const results = {};\n          \n          try {\n            // EC2 인스턴스 조회\n            console.log('📊 Checking EC2 instances...');\n            const ec2 = new EC2Client({ region: process.env.AWS_REGION });\n            const instances = await ec2.send(new DescribeInstancesCommand({}));\n            \n            results.ec2Details = [];\n            results.ec2Count = 0;\n            \n            if (instances.Reservations) {\n              instances.Reservations.forEach(reservation => {\n                reservation.Instances?.forEach(instance => {\n                  results.ec2Count++;\n                  results.ec2Details.push({\n                    id: instance.InstanceId,\n                    type: instance.InstanceType,\n                    state: instance.State?.Name,\n                    az: instance.Placement?.AvailabilityZone\n                  });\n                });\n              });\n            }\n            \n            // S3 버킷 조회\n            console.log('📊 Checking S3 buckets...');\n            const s3 = new S3Client({ region: process.env.AWS_REGION });\n            const buckets = await s3.send(new ListBucketsCommand({}));\n            results.s3Count = buckets.Buckets?.length || 0;\n            results.s3Details = buckets.Buckets?.map(bucket => ({\n              name: bucket.Name,\n              created: bucket.CreationDate\n            })) || [];\n            \n            // Lambda 함수 조회\n            console.log('📊 Checking Lambda functions...');\n            const lambda = new LambdaClient({ region: process.env.AWS_REGION });\n            const functions = await lambda.send(new ListFunctionsCommand({}));\n            results.lambdaCount = functions.Functions?.length || 0;\n            results.lambdaDetails = functions.Functions?.map(func => ({\n              name: func.FunctionName,\n              runtime: func.Runtime,\n              size: func.CodeSize\n            })) || [];\n            \n            console.log('✅ Resource check completed:', results);\n            return {\n              messageVersion: '1.0',\n              response: {\n                actionGroup: 'resourcecheck',\n                function: 'check_resources',\n                functionResponse: {\n                  responseBody: {\n                    'TEXT': {\n                      body: JSON.stringify(results)\n                    }\n                  }\n                }\n              }\n            };\n          } catch (error) {\n            console.log('❌ Error in checkResources:', error);\n            return {\n              messageVersion: '1.0',\n              response: {\n                actionGroup: 'resourcecheck',\n                function: 'check_resources',\n                functionResponse: {\n                  responseBody: {\n                    'TEXT': {\n                      body: 'Error: ' + error.message\n                    }\n                  }\n                }\n              }\n            };\n          }\n        }\n      "
+                    },
+                    "handler": "index.handler",
+                    "role": {
+                      "Fn::GetAtt": [
+                        "MCPServerLambdaServiceRole80A37792",
+                        "Arn"
+                      ]
+                    },
+                    "runtime": "nodejs18.x",
+                    "timeout": 120
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
+                  "version": "2.161.1"
+                }
+              },
+              "BedrockInvokePermission": {
+                "id": "BedrockInvokePermission",
+                "path": "TrustAdvisorServiceStack/MCPServerLambda/BedrockInvokePermission",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                  "aws:cdk:cloudformation:props": {
+                    "action": "lambda:InvokeFunction",
+                    "functionName": {
+                      "Fn::GetAtt": [
+                        "MCPServerLambdaD36410E3",
+                        "Arn"
+                      ]
+                    },
+                    "principal": "bedrock.amazonaws.com",
+                    "sourceAccount": "713881821833"
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                  "version": "2.161.1"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_lambda.Function",
+              "version": "2.161.1"
+            }
+          },
+          "SimpleTestAgent": {
+            "id": "SimpleTestAgent",
+            "path": "TrustAdvisorServiceStack/SimpleTestAgent",
+            "attributes": {
+              "aws:cdk:cloudformation:type": "AWS::Bedrock::Agent",
+              "aws:cdk:cloudformation:props": {
+                "actionGroups": [
+                  {
+                    "actionGroupName": "resourcecheck",
+                    "description": "AWS 리소스 현황 조회",
+                    "actionGroupExecutor": {
+                      "lambda": {
+                        "Fn::GetAtt": [
+                          "MCPServerLambdaD36410E3",
+                          "Arn"
+                        ]
+                      }
+                    },
+                    "functionSchema": {
+                      "functions": [
+                        {
+                          "name": "check_resources",
+                          "description": "AWS 리소스 현황을 조회합니다. EC2 인스턴스, S3 버킷, Lambda 함수 등의 정보를 제공합니다."
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "agentName": "aws-mcp-agent",
+                "agentResourceRoleArn": {
+                  "Fn::GetAtt": [
+                    "BedrockAgentRole7C982E0C",
+                    "Arn"
+                  ]
+                },
+                "autoPrepare": true,
+                "description": "AWS 리소스 조회 및 MCP 기능 에이전트",
+                "foundationModel": "anthropic.claude-3-5-sonnet-20240620-v1:0",
+                "instruction": "당신은 AWS 전문 어시스턴트입니다. 다음 기능을 제공합니다:\n        - AWS 리소스 현황 조회 (읽기 전용)\n        - AWS 베스트 프랙티스 안내\n        - 보안 및 비용 최적화 가이드\n        \n        중요: 리소스 생성/수정/삭제는 절대 수행하지 않습니다."
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_bedrock.CfnAgent",
+              "version": "2.161.1"
+            }
+          },
+          "MCPChatbotAgentAlias": {
+            "id": "MCPChatbotAgentAlias",
+            "path": "TrustAdvisorServiceStack/MCPChatbotAgentAlias",
+            "attributes": {
+              "aws:cdk:cloudformation:type": "AWS::Bedrock::AgentAlias",
+              "aws:cdk:cloudformation:props": {
+                "agentAliasName": "withaction",
+                "agentId": {
+                  "Fn::GetAtt": [
+                    "SimpleTestAgent",
+                    "AgentId"
+                  ]
+                },
+                "description": "Production alias with action groups"
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_bedrock.CfnAgentAlias",
+              "version": "2.161.1"
+            }
+          },
           "UserPoolId": {
             "id": "UserPoolId",
             "path": "TrustAdvisorServiceStack/UserPoolId",
@@ -131,6 +506,30 @@
           "UserPoolClientId": {
             "id": "UserPoolClientId",
             "path": "TrustAdvisorServiceStack/UserPoolClientId",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.161.1"
+            }
+          },
+          "BedrockAgentId": {
+            "id": "BedrockAgentId",
+            "path": "TrustAdvisorServiceStack/BedrockAgentId",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.161.1"
+            }
+          },
+          "BedrockAgentAliasId": {
+            "id": "BedrockAgentAliasId",
+            "path": "TrustAdvisorServiceStack/BedrockAgentAliasId",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.161.1"
+            }
+          },
+          "MCPLambdaArn": {
+            "id": "MCPLambdaArn",
+            "path": "TrustAdvisorServiceStack/MCPLambdaArn",
             "constructInfo": {
               "fqn": "aws-cdk-lib.CfnOutput",
               "version": "2.161.1"

@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { authRoutes } from './routes/auth';
 import { checksRoutes } from './routes/checks';
+import chatRoutes from './routes/chat';
 import { errorHandler } from './middleware/error-handler';
 
 // .env 파일 경로를 명시적으로 지정
@@ -32,6 +33,7 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/checks', checksRoutes);
+app.use('/api', chatRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

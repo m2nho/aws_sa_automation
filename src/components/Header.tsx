@@ -24,6 +24,14 @@ export default function Header() {
                 AWS Trust Advisor
               </h1>
             </div>
+            <nav className="ml-10 flex space-x-8">
+              <a href="/dashboard" className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+                대시보드
+              </a>
+              <a href="/chat" className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+                MCP 챗봇
+              </a>
+            </nav>
           </div>
           
           {isLoggedIn && (

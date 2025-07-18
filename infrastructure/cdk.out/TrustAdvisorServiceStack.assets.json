@@ -1,7 +1,7 @@
 {
   "version": "38.0.1",
   "files": {
-    "4e99a3a060a621bb509f018a3c079f0291b6c0245087b61b7d573a6b3d40aba8": {
+    "8024ed80be1a94c711199c4e9db68cd6b86edb01c883b3db7147f9246d0c464d": {
       "source": {
         "path": "TrustAdvisorServiceStack.template.json",
         "packaging": "file"
@@ -9,7 +9,7 @@
       "destinations": {
         "713881821833-ap-northeast-2": {
           "bucketName": "cdk-hnb659fds-assets-713881821833-ap-northeast-2",
-          "objectKey": "4e99a3a060a621bb509f018a3c079f0291b6c0245087b61b7d573a6b3d40aba8.json",
+          "objectKey": "8024ed80be1a94c711199c4e9db68cd6b86edb01c883b3db7147f9246d0c464d.json",
           "region": "ap-northeast-2",
           "assumeRoleArn": "arn:${AWS::Partition}:iam::713881821833:role/cdk-hnb659fds-file-publishing-role-713881821833-ap-northeast-2"
         }

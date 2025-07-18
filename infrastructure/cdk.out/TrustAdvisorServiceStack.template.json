@@ -84,10 +84,283 @@
     "aws:cdk:path": "TrustAdvisorServiceStack/TrustAdvisorUserPoolClient/Resource"
    }
   },
+  "BedrockAgentRole7C982E0C": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "bedrock.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/AmazonBedrockFullAccess"
+       ]
+      ]
+     }
+    ],
+    "Policies": [
+     {
+      "PolicyDocument": {
+       "Statement": [
+        {
+         "Action": [
+          "cloudwatch:Get*",
+          "cloudwatch:List*",
+          "ec2:Describe*",
+          "iam:Get*",
+          "iam:List*",
+          "lambda:Get*",
+          "lambda:List*",
+          "s3:Get*",
+          "s3:List*",
+          "support:Describe*",
+          "trustedadvisor:Describe*"
+         ],
+         "Effect": "Allow",
+         "Resource": "*"
+        },
+        {
+         "Action": "lambda:InvokeFunction",
+         "Effect": "Allow",
+         "Resource": "arn:aws:lambda:ap-northeast-2:713881821833:function:*MCPServerLambda*"
+        }
+       ],
+       "Version": "2012-10-17"
+      },
+      "PolicyName": "ReadOnlyAccess"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "TrustAdvisorServiceStack/BedrockAgentRole/Resource"
+   }
+  },
+  "BedrockAgentRoleDefaultPolicy1462CD5B": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "lambda:InvokeFunction",
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "MCPServerLambdaD36410E3",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "MCPServerLambdaD36410E3",
+             "Arn"
+            ]
+           },
+           ":*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "BedrockAgentRoleDefaultPolicy1462CD5B",
+    "Roles": [
+     {
+      "Ref": "BedrockAgentRole7C982E0C"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "TrustAdvisorServiceStack/BedrockAgentRole/DefaultPolicy/Resource"
+   }
+  },
+  "MCPServerLambdaServiceRole80A37792": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "TrustAdvisorServiceStack/MCPServerLambda/ServiceRole/Resource"
+   }
+  },
+  "MCPServerLambdaServiceRoleDefaultPolicyE5A252DF": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "ec2:Describe*",
+        "lambda:Get*",
+        "lambda:List*",
+        "s3:Get*",
+        "s3:List*"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "MCPServerLambdaServiceRoleDefaultPolicyE5A252DF",
+    "Roles": [
+     {
+      "Ref": "MCPServerLambdaServiceRole80A37792"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "TrustAdvisorServiceStack/MCPServerLambda/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "MCPServerLambdaD36410E3": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "ZipFile": "\n        const { EC2Client, DescribeInstancesCommand } = require('@aws-sdk/client-ec2');\n        const { S3Client, ListBucketsCommand, GetBucketEncryptionCommand } = require('@aws-sdk/client-s3');\n        const { LambdaClient, ListFunctionsCommand } = require('@aws-sdk/client-lambda');\n        \n        exports.handler = async (event) => {\n          console.log('🚀 MCP LAMBDA CALLED! Event:', JSON.stringify(event, null, 2));\n          console.log('🚀 LAMBDA FUNCTION DEFINITELY INVOKED!');\n          \n          const { actionGroup, function: functionName, parameters } = event;\n          \n          try {\n            console.log('Processing actionGroup:', actionGroup);\n            switch (actionGroup) {\n              case 'resourcecheck':\n                console.log('🔍 Calling checkResources function');\n                return await checkResources(parameters);\n              default:\n                console.log('❌ Unknown action group:', actionGroup);\n                return { error: 'Unknown action group: ' + actionGroup };\n            }\n          } catch (error) {\n            console.log('❌ Lambda error:', error);\n            return {\n              messageVersion: '1.0',\n              response: {\n                actionGroup: actionGroup,\n                function: functionName,\n                functionResponse: {\n                  responseBody: {\n                    'TEXT': {\n                      body: 'Error: ' + error.message\n                    }\n                  }\n                }\n              }\n            };\n          }\n        };\n        \n        async function checkResources(params) {\n          console.log('🔍 checkResources function called with params:', params);\n          const results = {};\n          \n          try {\n            // EC2 인스턴스 조회\n            console.log('📊 Checking EC2 instances...');\n            const ec2 = new EC2Client({ region: process.env.AWS_REGION });\n            const instances = await ec2.send(new DescribeInstancesCommand({}));\n            \n            results.ec2Details = [];\n            results.ec2Count = 0;\n            \n            if (instances.Reservations) {\n              instances.Reservations.forEach(reservation => {\n                reservation.Instances?.forEach(instance => {\n                  results.ec2Count++;\n                  results.ec2Details.push({\n                    id: instance.InstanceId,\n                    type: instance.InstanceType,\n                    state: instance.State?.Name,\n                    az: instance.Placement?.AvailabilityZone\n                  });\n                });\n              });\n            }\n            \n            // S3 버킷 조회\n            console.log('📊 Checking S3 buckets...');\n            const s3 = new S3Client({ region: process.env.AWS_REGION });\n            const buckets = await s3.send(new ListBucketsCommand({}));\n            results.s3Count = buckets.Buckets?.length || 0;\n            results.s3Details = buckets.Buckets?.map(bucket => ({\n              name: bucket.Name,\n              created: bucket.CreationDate\n            })) || [];\n            \n            // Lambda 함수 조회\n            console.log('📊 Checking Lambda functions...');\n            const lambda = new LambdaClient({ region: process.env.AWS_REGION });\n            const functions = await lambda.send(new ListFunctionsCommand({}));\n            results.lambdaCount = functions.Functions?.length || 0;\n            results.lambdaDetails = functions.Functions?.map(func => ({\n              name: func.FunctionName,\n              runtime: func.Runtime,\n              size: func.CodeSize\n            })) || [];\n            \n            console.log('✅ Resource check completed:', results);\n            return {\n              messageVersion: '1.0',\n              response: {\n                actionGroup: 'resourcecheck',\n                function: 'check_resources',\n                functionResponse: {\n                  responseBody: {\n                    'TEXT': {\n                      body: JSON.stringify(results)\n                    }\n                  }\n                }\n              }\n            };\n          } catch (error) {\n            console.log('❌ Error in checkResources:', error);\n            return {\n              messageVersion: '1.0',\n              response: {\n                actionGroup: 'resourcecheck',\n                function: 'check_resources',\n                functionResponse: {\n                  responseBody: {\n                    'TEXT': {\n                      body: 'Error: ' + error.message\n                    }\n                  }\n                }\n              }\n            };\n          }\n        }\n      "
+    },
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "MCPServerLambdaServiceRole80A37792",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs18.x",
+    "Timeout": 120
+   },
+   "DependsOn": [
+    "MCPServerLambdaServiceRoleDefaultPolicyE5A252DF",
+    "MCPServerLambdaServiceRole80A37792"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "TrustAdvisorServiceStack/MCPServerLambda/Resource"
+   }
+  },
+  "MCPServerLambdaBedrockInvokePermission0BE41085": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "MCPServerLambdaD36410E3",
+      "Arn"
+     ]
+    },
+    "Principal": "bedrock.amazonaws.com",
+    "SourceAccount": "713881821833"
+   },
+   "Metadata": {
+    "aws:cdk:path": "TrustAdvisorServiceStack/MCPServerLambda/BedrockInvokePermission"
+   }
+  },
+  "SimpleTestAgent": {
+   "Type": "AWS::Bedrock::Agent",
+   "Properties": {
+    "ActionGroups": [
+     {
+      "ActionGroupExecutor": {
+       "Lambda": {
+        "Fn::GetAtt": [
+         "MCPServerLambdaD36410E3",
+         "Arn"
+        ]
+       }
+      },
+      "ActionGroupName": "resourcecheck",
+      "Description": "AWS 리소스 현황 조회",
+      "FunctionSchema": {
+       "Functions": [
+        {
+         "Description": "AWS 리소스 현황을 조회합니다. EC2 인스턴스, S3 버킷, Lambda 함수 등의 정보를 제공합니다.",
+         "Name": "check_resources"
+        }
+       ]
+      }
+     }
+    ],
+    "AgentName": "aws-mcp-agent",
+    "AgentResourceRoleArn": {
+     "Fn::GetAtt": [
+      "BedrockAgentRole7C982E0C",
+      "Arn"
+     ]
+    },
+    "AutoPrepare": true,
+    "Description": "AWS 리소스 조회 및 MCP 기능 에이전트",
+    "FoundationModel": "anthropic.claude-3-5-sonnet-20240620-v1:0",
+    "Instruction": "당신은 AWS 전문 어시스턴트입니다. 다음 기능을 제공합니다:\n        - AWS 리소스 현황 조회 (읽기 전용)\n        - AWS 베스트 프랙티스 안내\n        - 보안 및 비용 최적화 가이드\n        \n        중요: 리소스 생성/수정/삭제는 절대 수행하지 않습니다."
+   },
+   "Metadata": {
+    "aws:cdk:path": "TrustAdvisorServiceStack/SimpleTestAgent"
+   }
+  },
+  "MCPChatbotAgentAlias": {
+   "Type": "AWS::Bedrock::AgentAlias",
+   "Properties": {
+    "AgentAliasName": "withaction",
+    "AgentId": {
+     "Fn::GetAtt": [
+      "SimpleTestAgent",
+      "AgentId"
+     ]
+    },
+    "Description": "Production alias with action groups"
+   },
+   "Metadata": {
+    "aws:cdk:path": "TrustAdvisorServiceStack/MCPChatbotAgentAlias"
+   }
+  },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02JMQ7CMAwA39I9MaQDYu8DQEXMKKQGuQ12FSd0qPp3BBWI6U53NbidA1f5SW3oBhvpCvMp+zAYP+klyJ0pC8xnxXQUiaa58c+/0kRCzv9rLcs7HUoey2e2qFJSwMWwdAi9bp71FtweXNUrkU2FMz0Q2pUvn36NP5sAAAA="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02NwWrDMBBEvyV3eVvlEHI1hl5rXHoOsqyEjeXdoJUSgtC/B9t1yWnezluYPeiDBr0zD6nsMFYee8g/0dhRmYecsuULYWTIv+JCy+xVc6Z/3qDx6Ci+q7UpCs0EuWPvZrlkyx7tcz5XKsqbqR8M5K9ENiLT7N65dWFCEWQqqndDYDtCbs5UX/5GF6g9GilFdU44BbsMfqd4S8vL1hZFPDi4ysd9/wn6CHp3FcQqJIo4OejWfAGzuakdFwEAAA=="
    },
    "Metadata": {
     "aws:cdk:path": "TrustAdvisorServiceStack/CDKMetadata/Default"
@@ -105,6 +378,33 @@
    "Description": "Cognito User Pool Client ID",
    "Value": {
     "Ref": "TrustAdvisorUserPoolClientFA1DEF35"
+   }
+  },
+  "BedrockAgentId": {
+   "Description": "Bedrock Agent ID",
+   "Value": {
+    "Fn::GetAtt": [
+     "SimpleTestAgent",
+     "AgentId"
+    ]
+   }
+  },
+  "BedrockAgentAliasId": {
+   "Description": "Bedrock Agent Alias ID",
+   "Value": {
+    "Fn::GetAtt": [
+     "MCPChatbotAgentAlias",
+     "AgentAliasId"
+    ]
+   }
+  },
+  "MCPLambdaArn": {
+   "Description": "MCP Server Lambda Function ARN (Read-only)",
+   "Value": {
+    "Fn::GetAtt": [
+     "MCPServerLambdaD36410E3",
+     "Arn"
+    ]
    }
   }
  },

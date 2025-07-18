@@ -19,7 +19,7 @@
         "notificationArns": [],
         "assumeRoleArn": "arn:${AWS::Partition}:iam::713881821833:role/cdk-hnb659fds-deploy-role-713881821833-ap-northeast-2",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::713881821833:role/cdk-hnb659fds-cfn-exec-role-713881821833-ap-northeast-2",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-713881821833-ap-northeast-2/4e99a3a060a621bb509f018a3c079f0291b6c0245087b61b7d573a6b3d40aba8.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-713881821833-ap-northeast-2/8024ed80be1a94c711199c4e9db68cd6b86edb01c883b3db7147f9246d0c464d.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -47,6 +47,54 @@
             "data": "TrustAdvisorUserPoolClientFA1DEF35"
           }
         ],
+        "/TrustAdvisorServiceStack/BedrockAgentRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BedrockAgentRole7C982E0C"
+          }
+        ],
+        "/TrustAdvisorServiceStack/BedrockAgentRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BedrockAgentRoleDefaultPolicy1462CD5B"
+          }
+        ],
+        "/TrustAdvisorServiceStack/MCPServerLambda/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MCPServerLambdaServiceRole80A37792"
+          }
+        ],
+        "/TrustAdvisorServiceStack/MCPServerLambda/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MCPServerLambdaServiceRoleDefaultPolicyE5A252DF"
+          }
+        ],
+        "/TrustAdvisorServiceStack/MCPServerLambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MCPServerLambdaD36410E3"
+          }
+        ],
+        "/TrustAdvisorServiceStack/MCPServerLambda/BedrockInvokePermission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MCPServerLambdaBedrockInvokePermission0BE41085"
+          }
+        ],
+        "/TrustAdvisorServiceStack/SimpleTestAgent": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SimpleTestAgent"
+          }
+        ],
+        "/TrustAdvisorServiceStack/MCPChatbotAgentAlias": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MCPChatbotAgentAlias"
+          }
+        ],
         "/TrustAdvisorServiceStack/UserPoolId": [
           {
             "type": "aws:cdk:logicalId",
@@ -57,6 +105,24 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "UserPoolClientId"
+          }
+        ],
+        "/TrustAdvisorServiceStack/BedrockAgentId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BedrockAgentId"
+          }
+        ],
+        "/TrustAdvisorServiceStack/BedrockAgentAliasId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BedrockAgentAliasId"
+          }
+        ],
+        "/TrustAdvisorServiceStack/MCPLambdaArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MCPLambdaArn"
           }
         ],
         "/TrustAdvisorServiceStack/CDKMetadata/Default": [
